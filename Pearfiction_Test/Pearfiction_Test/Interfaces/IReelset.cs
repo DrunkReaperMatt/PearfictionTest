@@ -4,6 +4,5 @@ public interface IReelset
 {
     List<IBands> Bands { get; set; }
 
-
-    void RollReels();
+    void ShuffleBands();
 }

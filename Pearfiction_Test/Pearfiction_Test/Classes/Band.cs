@@ -1,10 +1,15 @@
 namespace Pearfiction_Test.Classes;
 
-public class Band(params ISymbol[] symbols) : IBands
+public class Band : IBands
 {
-    public List<ISymbol> Symbols { get; set; } = new (symbols);
+    public List<ISymbol> Symbols { get; set; }
     public List<ISymbol> Results { get; set; } = [];
 
+    public Band(params ISymbol[] symbols)
+    {
+        Symbols?.AddRange(symbols);
+    }
+    
     public ISymbol GetSymbolByIndex(int index)
     {
         return Symbols[GetWrappedIndex(index)];
@@ -19,8 +24,7 @@ public class Band(params ISymbol[] symbols) : IBands
     {
         Results.AddRange(symbols);
     }
-
-
+    
     private int GetWrappedIndex(int index)
     {
         return ((index % Symbols.Count) + Symbols.Count) % Symbols.Count;

@@ -1,12 +1,17 @@
 namespace Pearfiction_Test.Classes;
 
-public class Reelset(params IBands[] bands) : IReelset
+public class Reelset : IReelset
 {
-    public List<IBands> Bands { get; set; } = new(bands);
+    public List<IBands> Bands { get; set; }
 
-    private List<ISymbol> output = [];
+    private List<ISymbol> _output = [];
     
-    public void RollReels()
+    public Reelset(params IBands[] bands)
+    {
+        Bands?.AddRange(bands);
+    }
+    
+    public void ShuffleBands()
     {
         var rand = new Random();
 
@@ -14,7 +19,6 @@ public class Reelset(params IBands[] bands) : IReelset
         foreach (var band in Bands)
         {
             int index = rand.Next(band.Symbols.Count);
-            var symbol = band.Symbols[index];
             indexes.Add(index);
         }
         
@@ -43,10 +47,10 @@ public class Reelset(params IBands[] bands) : IReelset
             Bands[i].AddResults(one, two, three);
         }
         
-        output.Clear();
-        output.AddRange(uppers);
-        output.AddRange(centers);
-        output.AddRange(lowers);
+        _output.Clear();
+        _output.AddRange(uppers);
+        _output.AddRange(centers);
+        _output.AddRange(lowers);
 
         Console.WriteLine($"Stop Positions: {string.Join(", ", indexes)}");
         
@@ -57,19 +61,19 @@ public class Reelset(params IBands[] bands) : IReelset
 
     private void CalculateReel(List<int> indexes)
     {
-        for (int i = 0; i < output.Count; i = i + 5)
+        for (int i = 0; i < _output.Count; i = i + 5)
         {
-            if (Bands[1].CompareBands(output[i]) <= 0) continue;
+            if (Bands[1].CompareBands(_output[i]) <= 0) continue;
 
-            if (Bands[2].CompareBands(output[i]) <= 0) continue;
+            if (Bands[2].CompareBands(_output[i]) <= 0) continue;
 
-            if (Bands[3].CompareBands(output[i]) > 0)
+            if (Bands[3].CompareBands(_output[i]) > 0)
             {
-                Console.WriteLine(Bands[4].CompareBands(output[i]) > 0 ? $"{output[i].Name} | 5 Matches: {output[i].PayTable.FiveKind}" : $"{output[i].Name} | 4 Matches: {output[i].PayTable.FourKind}");
+                Console.WriteLine(Bands[4].CompareBands(_output[i]) > 0 ? $"{_output[i].Name} | 5 Matches: {_output[i].PayTable.FiveKind}" : $"{_output[i].Name} | 4 Matches: {_output[i].PayTable.FourKind}");
             }
             else
             {
-                Console.WriteLine($"{output[i].Name} | 3 Matches: {output[i].PayTable.ThreeKind}");
+                Console.WriteLine($"{_output[i].Name} | 3 Matches: {_output[i].PayTable.ThreeKind}");
             }
         }
     }
