@@ -24,12 +24,12 @@ Band band5 = new(sym7, sym8, sym2, sym3, sym4, sym1, sym3, sym2, sym2, sym4, sym
     sym1, sym6, sym4, sym8);
 
 // Assign the bands to the Reel.
-Reelset Reel = new(band1, band2, band3, band4, band5);
+Reelset reel = new(band1, band2, band3, band4, band5);
 
 // Program loop.
 while (true)
 {
-    Reel.ShuffleBands();
+    reel.ShuffleBands();
     
 
     Console.WriteLine("Press 1 to exit");
