@@ -16,31 +16,6 @@ public class Band : IBands
         return Symbols[GetWrappedIndex(index)];
     }
 
-    public int CompareBands(ISymbol result, out int[] hits)
-    {
-        if (!Results.ContainsValue(result))
-        {
-            hits = [];
-            return 0;
-        }
-
-        var symbols = Results.Values.ToArray();
-        List<int> indexes = [];
-        for (int i = 0; i < Results.Count; i++)
-        {
-            if (symbols[i].Name == result.Name)
-            {
-               indexes.Add(Results.Keys.ToArray()[i]);
-            }
-        }
-        
-        hits = indexes.ToArray();
-
-        return 1;
-
-        //return Results.Count(currentSymbol => currentSymbol.Name == result.Name);
-    }
-
     public void AddResults(int[] indexes, ISymbol[] symbols)
     {
         for (int i = 0; i < indexes.Length; i++)

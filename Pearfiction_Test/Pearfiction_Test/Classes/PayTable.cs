@@ -6,10 +6,10 @@ public class PayTable : IPayTable
     public int FourKind { get; set; }
     public int FiveKind { get; set; }
 
-    public PayTable(int ThreeKind, int FourKind, int FiveKind)
+    public PayTable(int threeKind, int fourKind, int fiveKind)
     {
-        this.ThreeKind = ThreeKind;
-        this.FourKind = FourKind;
-        this.FiveKind = FiveKind;
+        ThreeKind = threeKind;
+        FourKind = fourKind;
+        FiveKind = fiveKind;
     }
 }

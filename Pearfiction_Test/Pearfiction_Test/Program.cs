@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Pearfiction_Test;
 using Pearfiction_Test.Classes;
 
 // Initialize Symbols with payouts.
@@ -24,14 +25,23 @@ Band band5 = new(sym7, sym8, sym2, sym3, sym4, sym1, sym3, sym2, sym2, sym4, sym
     sym1, sym6, sym4, sym8);
 
 // Assign the bands to the Reel.
-Reelset reel = new(band1, band2, band3, band4, band5);
+Reelset reel = new (band1, band2, band3, band4, band5);
 
 // Program loop.
 while (true)
 {
-    reel.ShuffleBands();
+    // Resets the state of the reel
+    reel.ResetReel();
     
+    // Calculations of the reel
+    reel.ShuffleBands();
+    reel.CalculateResults();
+    
+    // Printouts on the screen
+    reel.DisplayScreen();
+    reel.PrintWinnings();
 
+    // Console feature to exit or continue
     Console.WriteLine("Press 1 to exit");
     var exit = Console.ReadLine();
 

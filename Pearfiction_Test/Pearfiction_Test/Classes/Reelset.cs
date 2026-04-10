@@ -3,150 +3,75 @@ namespace Pearfiction_Test.Classes;
 public class Reelset : IReelset
 {
     public List<IBands> Bands { get; set; } = [];
+    public List<int> Indexes { get; set; } = [];
 
-    private List<ISymbol> _output = [];
+    private readonly List<ISymbol> _screenDisplay;
+    private List<(ISymbol, string)> _winnings;
+    private List<ISymbol> _centerRow;
+    private List<ISymbol> _upperRow;
+    private List<ISymbol> _lowerRow;
     
     public Reelset(params IBands[] bands)
     {
         Bands.AddRange(bands);
+        _screenDisplay = [];
     }
-    
+
     public void ShuffleBands()
     {
         var rand = new Random();
 
-        List<int> indexes = [];
         foreach (var band in Bands)
         {
             int index = rand.Next(band.Symbols.Count);
-            indexes.Add(index);
+            Indexes.Add(index);
         }
-
-        indexes = [15, 7, 9, 10, 17];
-
-        DisplayResults(indexes.ToArray());
-        
-        //CalculateReel(indexes);
-
-        List<(ISymbol, string)> results = calc();
-        PrintResults(results);
-        
-        ClearScreen();
     }
 
-    private void DisplayResults(int[] indexes)
+    public void CalculateResults()
     {
-        List<ISymbol> centers = [];
-        List<ISymbol> uppers = [];
-        List<ISymbol> lowers = [];
+        _centerRow = [];
+        _upperRow = [];
+        _lowerRow = [];
         
-        for (int i = 0; i < indexes.Length; i++)
+        _screenDisplay.Clear();
+        
+        for (int i = 0; i < Indexes.Count; i++)
         {
-            var one = Bands[i].GetSymbolByIndex(indexes[i]);
-            var two = Bands[i].GetSymbolByIndex(indexes[i ]+ 1);
-            var three = Bands[i].GetSymbolByIndex(indexes[i] + 2);
+            var one = Bands[i].GetSymbolByIndex(Indexes[i]);
+            var two = Bands[i].GetSymbolByIndex(Indexes[i ]+ 1);
+            var three = Bands[i].GetSymbolByIndex(Indexes[i] + 2);
 
-            uppers.Add(one);
-            centers.Add(two);
-            lowers.Add(three);
+            _upperRow.Add(one);
+            _centerRow.Add(two);
+            _lowerRow.Add(three);
             
-            Bands[i].AddResults([indexes[i], indexes[i] + 1, indexes[i] + 2], [one, two, three]);
+            Bands[i].AddResults([Indexes[i], Indexes[i] + 1, Indexes[i] + 2], [one, two, three]);
         }
         
-        _output.Clear();
-        _output.AddRange(uppers);
-        _output.AddRange(centers);
-        _output.AddRange(lowers);
+        _screenDisplay.AddRange(_upperRow);
+        _screenDisplay.AddRange(_centerRow);
+        _screenDisplay.AddRange(_lowerRow);
 
-        Console.WriteLine($"Stop Positions: {string.Join(", ", indexes)}");
-        
-        Console.WriteLine(string.Join(" || ", uppers.Select(x => x.Name)));
-        Console.WriteLine(string.Join(" || ", centers.Select(x => x.Name)));
-        Console.WriteLine(string.Join(" || ", lowers.Select(x => x.Name)));
+        _winnings = CalculateReel();
     }
 
-    private void CalculateReel(List<int> indexes)
+    public void DisplayScreen()
     {
-        int payout = 0;
-        for (int i = 0; i < _output.Count; i = i + 5)
-        {
-            List<int> matchingSymbols = [];
-            if (Bands[1].CompareBands(_output[i], out var band2) <= 0) continue;
-            
-            Console.WriteLine(band2[1]);
-
-            if (Bands[2].CompareBands(_output[i], out var band3) <= 0) continue;
-
-            if (Bands[3].CompareBands(_output[i], out var band4) <= 0)
-            {
-                 Console.WriteLine($"{_output[i].Name} | 3 Matches: {_output[i].PayTable.ThreeKind}");
-            }
-            
-            if (Bands[4].CompareBands(_output[i], out var band5) <= 0)
-            {
-                Console.WriteLine($"{_output[i].Name} | 4 Matches: {_output[i].PayTable.FourKind}");
-            }
-            else
-            {
-                Console.WriteLine($"{_output[i].Name} | 5 Matches: {_output[i].PayTable.FiveKind}");
-            }
-        }
-    }
-
-    private List<(ISymbol, string)> calc()
-    {
-        List<(ISymbol, string)> matches = [];
-        for (int i = 0; i < _output.Count; i = i + 5)
-        {
-            string line;
-            for (int j = 1; j < _output.Count; j = j + 5)
-            {
-                if (_output[i] != _output[j])
-                {
-                    continue;
-                }
-
-                for (int k = 2; k < _output.Count; k = k + 5)
-                {
-                    if (_output[k] != _output[i])
-                    {
-                        continue;
-                    }
-
-                    line = $"{i}-{j}-{k}";
-                    for (int l = 3; l < _output.Count; l = l + 5)
-                    {
-                        if (_output[l] != _output[i])
-                        {
-                            continue;
-                        }
-                        
-                        line += $"-{l}";
-                        for (int m = 4; m < _output.Count; m = m + 5)
-                        {
-                            if (_output[m] != _output[i])
-                            {
-                                continue;
-                            }
-
-                            line += $"-{m}";
-                        }
-                    }
-                    
-                    matches.Add((_output[i], line));
-                }
-            }
-        }
+        Console.WriteLine($"Stop Positions: {string.Join(", ", Indexes)}");
+        Console.WriteLine("Screen:");
         
-        return matches;
+        Console.WriteLine(string.Join(" ", _upperRow.Select(x => x.Name)));
+        Console.WriteLine(string.Join(" ", _centerRow.Select(x => x.Name)));
+        Console.WriteLine(string.Join(" ", _lowerRow.Select(x => x.Name)));
     }
-
-    void PrintResults(List<(ISymbol, string)> winnings)
+    
+    public void PrintWinnings()
     {
         int totalWinnings = 0;
         List<string> winningLineMessages = [];
         
-        foreach (var winner in winnings)
+        foreach (var winner in _winnings)
         {
             switch (winner.Item2.Split('-').Length)
             {
@@ -171,11 +96,61 @@ public class Reelset : IReelset
         winningLineMessages.ForEach(Console.WriteLine);
     }
 
-    private void ClearScreen()
+    public void ResetReel()
     {
         foreach (var band in Bands)
         {
             band.Results.Clear();
         }
+        
+        Indexes.Clear();
+    }
+    
+    private List<(ISymbol, string)> CalculateReel()
+    {
+        List<(ISymbol, string)> matches = [];
+        for (int i = 0; i < _screenDisplay.Count; i = i + 5)
+        {
+            string line;
+            for (int j = 1; j < _screenDisplay.Count; j = j + 5)
+            {
+                if (_screenDisplay[i] != _screenDisplay[j])
+                {
+                    continue;
+                }
+
+                for (int k = 2; k < _screenDisplay.Count; k = k + 5)
+                {
+                    if (_screenDisplay[k] != _screenDisplay[i])
+                    {
+                        continue;
+                    }
+
+                    line = $"{i}-{j}-{k}";
+                    for (int l = 3; l < _screenDisplay.Count; l = l + 5)
+                    {
+                        if (_screenDisplay[l] != _screenDisplay[i])
+                        {
+                            continue;
+                        }
+                        
+                        line += $"-{l}";
+                        for (int m = 4; m < _screenDisplay.Count; m = m + 5)
+                        {
+                            if (_screenDisplay[m] != _screenDisplay[i])
+                            {
+                                continue;
+                            }
+
+                            line += $"-{m}";
+                        }
+                    }
+                    
+                    matches.Add((_screenDisplay[i], line));
+                }
+            }
+        }
+        
+        return matches;
     }
 }

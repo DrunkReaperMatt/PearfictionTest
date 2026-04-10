@@ -10,9 +10,4 @@ public class Symbol: ISymbol
         Name = name;
         PayTable = payTable;
     }
-    
-    public int CheckMatches(ISymbol nextSymbol)
-    {
-        return nextSymbol.Name == Name ? 1 : 0;
-    }
 }

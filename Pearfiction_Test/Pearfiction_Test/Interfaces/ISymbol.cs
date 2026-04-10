@@ -2,9 +2,7 @@ namespace Pearfiction_Test;
 
 public interface ISymbol
 {
-    public string Name { get; set; }
+    public string Name { get; }
 
-    public IPayTable PayTable { get; set; }
-    
-    public int CheckMatches(ISymbol nextSymbol);
+    public IPayTable PayTable { get; }
 }
